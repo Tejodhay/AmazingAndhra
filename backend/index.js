@@ -37,12 +37,18 @@ const connect = async () => {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    message: "AmazingAndhra API is running",
+  });
+});
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/tours", tourRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/booking", bookingRoute);
-app.listen(port, () => {
+app.listen(port, "0.0.0.0", () => {
   connect();
   console.log("Server listening on port", port);
 });
