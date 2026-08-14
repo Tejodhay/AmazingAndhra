@@ -9,13 +9,17 @@ export const register = async (req, res) => {
     // Check if user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "User already exists" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User already exists" });
     }
 
     // If registering as admin, verify the secret key
     if (role === "admin") {
       if (!adminSecretKey || adminSecretKey !== process.env.ADMIN_SECRET_KEY) {
-        return res.status(401).json({ success: false, message: "Invalid admin secret key" });
+        return res
+          .status(401)
+          .json({ success: false, message: "Invalid admin secret key" });
       }
     }
 
@@ -36,7 +40,9 @@ export const register = async (req, res) => {
 
     res.status(200).json({ success: true, message: "Successfully created" });
   } catch (error) {
-    res.status(500).json({ success: false, message: "Failed to create. Try again" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to create. Try again" });
   }
 };
 
@@ -54,7 +60,7 @@ export const login = async (req, res) => {
     //if user is exist the check the password
     const checkCorrectPassword = await bcrypt.compare(
       req.body.password,
-      user.password
+      user.password,
     );
 
     //if  password is incorrect
@@ -65,18 +71,20 @@ export const login = async (req, res) => {
     }
     const { password, role, ...rest } = user._doc;
 
-    //create jwt token
+    // create jwt token
     const token = jwt.sign(
       { id: user._id, role: user.role },
       process.env.JWT_SECERET_KEY,
-      { expiresIn: "15d" }
+      { expiresIn: "15d" },
     );
 
-    // set token in the browser cookies and send the response to the client
+    // set token in browser cookies
     res
       .cookie("accessToken", token, {
         httpOnly: true,
-        expires: token.expiresIn,
+        secure: true,
+        sameSite: "none",
+        maxAge: 15 * 24 * 60 * 60 * 1000,
       })
       .status(200)
       .json({

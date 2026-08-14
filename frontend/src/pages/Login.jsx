@@ -44,8 +44,16 @@ const Login = () => {
       }
 
       // Combine role with user data for context and localStorage
-      const userWithRole = { ...result.data, role: result.role };
-      dispatch({ type: "LOGIN_SUCCESS", payload: userWithRole });
+      const userWithRole = {
+        ...result.data,
+        role: result.role,
+        token: result.token,
+      };
+
+      dispatch({
+        type: "LOGIN_SUCCESS",
+        payload: userWithRole,
+      });
 
       if (result.role === "admin") {
         navigate("/admin");
